@@ -46,7 +46,7 @@ express_checkout.on('shippingaddresschange',event=>{
 		client_city:event.address.city??null,
 		client_postal_code:event.address.postal_code??null
 	});
-	event.resolve(payload);
+	//event.resolve(payload);
 });
 express_checkout.on('confirm',event=>{
 	stripe.confirmPayment({elements,confirmParams:{return_url:'https://eshop.teticharitou.com/checkout'}}).then(result=>{
