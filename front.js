@@ -1,5 +1,29 @@
+/* TODO:
+
+Θέλουμε να τραβάλει την πληροφορία από τον ApplePay μέσω Stripe, και να την στέλνει εδώ πριν ολοκληρώσει την αγορά:
+
+api('/client/update',{
+	shipping_address:'___',
+	city:'___',
+	telephone:'___',
+	email:'___',
+	first_name:'___',
+	last_name:'___',
+	postal_code:'___',
+	country_id:get_country_id('el')  // by country code
+ });
+
+first_name, telephone και email είναι αγκαστικά πεδία αν δεν υπάρχουν, δεν αφήνει να προχωρήσει στην αγορά.
+
+Στα υπόλοιπα, αν δεν υπάρχουν στείλε αυτό: '---',
+και στο country_id στείλε: 1
+
+*/
+
 const stripe=Stripe(STRIPE_KEY);
 var amount=parseFloat(price_el.innerText)*100;
+
+
 const elements=stripe.elements({
 	mode:'payment',
 	amount,
