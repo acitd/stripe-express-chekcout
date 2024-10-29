@@ -1,3 +1,28 @@
+/* Stripe setup */
+const stripe = Stripe(STRIPE_KEY);
+let amount = parseFloat(price_el.innerText) * 100;
+
+// ELEMENTS
+const elements = stripe.elements({
+    mode: 'payment',
+    amount,
+    currency: 'eur'
+});
+
+const expressCheckout = elements.create('expressCheckout');
+expressCheckout.mount(express_checkout_el);
+
+// EVENTS
+expressCheckout.on('click', event => {
+    const new_amount = parseFloat(price_el.innerText) * 100;
+    if (new_amount !== amount) {
+        amount = new_amount;
+        elements.update({ amount });
+    }
+    event.resolve();
+});
+
+// CONFIRM PAYMENT WITH CLIENT DETAILS FROM APPLE PAY
 expressCheckout.on('confirm', async event => {
 	try {
 		// Confirm Payment and retrieve client details from Apple Pay
