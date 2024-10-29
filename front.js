@@ -26,21 +26,21 @@ expressCheckout.on('click', event => {
 expressCheckout.on('confirm', async event => {
 	try {
 		// Confirm Payment and retrieve client details from Apple Pay
-		const result = await stripe.confirmPayment({
+		const result=await stripe.confirmPayment({
 			elements,
-			confirmParams: {
+			confirmParams:{
 				return_url: 'https://eshop.teticharitou.com/checkout',
-			},
+			}
 		});
 
-		if (result.error) {
+		if(result.error){
 			alert(result.error.message);
 			return;
 		}
 
 		// Extract client details from Apple Pay
-		const { paymentIntent, paymentMethod } = result;
-		const clientDetails = paymentMethod.billing_details;
+		const{payment_intent,payment_method}=result;
+		const clientDetails=payment_method.billing_details;
 
 		// Send client details to your backend endpoint
 		await api('/client/update', {
@@ -55,19 +55,16 @@ expressCheckout.on('confirm', async event => {
 		});
 
 		// Check if purchase can proceed
-		const canProceed = await api('/client/payment/check');
-		if (!canProceed) {
+		const can_proceed=await api('/client/payment/check');
+		if(!can_proceed){
 			alert("Payment cannot proceed. Please complete all required fields.");
 			return;
 		}
 
 		// Complete the purchase
-		const response = await api('/buy/stripe', { payment_intent: paymentIntent });
-		if (response) {
-			c1730199501i0.close();
-			location.href = '/order/' + response.order.id;
-		}
-
+		const response=await api('/buy/stripe',{payment_intent});
+		if(response)
+			location.href='/order/'+response.order.id;
 	} catch (error) {
 		console.error("Error in payment confirmation:", error);
 		alert("Payment failed. Please try again.");
