@@ -1,4 +1,4 @@
-const stripe=Stripe('pk_test_51NSJEjHHfzMEXIdV09EGF7ORsL8KPaHH7UhlUrsO2BEczBjupB1lqT3V6PyKBFapNBhj3StV6fvHR3hksCNtKOBX00ei3Nw8bL');
+const stripe=Stripe(STRIPE_KEY);
 var amount=parseFloat(price_el.innerText)*100;
 const elements=stripe.elements({
 	mode:'payment',
