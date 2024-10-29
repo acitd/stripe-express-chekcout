@@ -1,45 +1,52 @@
 /* TODO:
 
-Θέλουμε να τραβάλει την πληροφορία από τον ApplePay μέσω Stripe, και να την στέλνει εδώ πριν ολοκληρώσει την αγορά:
+Θέλουμε να τραβάλει την πληροφορία του χρήστη από το ApplePay account του μέσω Stripe, και να την στέλνει εδώ πριν ολοκληρώσει την αγορά:
 
 api('/client/update',{
-	shipping_address:'___',
-	city:'___',
-	telephone:'___',
-	email:'___',
-	first_name:'___',
-	last_name:'___',
-	postal_code:'___',
-	country_id:get_country_id('el')  // by country code
- });
+	client_first_name:'___',
+	client_last_name:'___',
+	client_telephone:'___',
+	client_email:'___',
+	client_country_id:get_country_id('el'),  // by country code
+	client_city:'___',
+	client_postal_code:'___',
+	client_address'___'
+});
 
-first_name, telephone και email είναι αγκαστικά πεδία αν δεν υπάρχουν, δεν αφήνει να προχωρήσει στην αγορά.
-
-Στα υπόλοιπα, αν δεν υπάρχουν στείλε αυτό: '---',
-και στο country_id στείλε: 1
+Στο παραπάνω endpoint όλα τα πεδία είναι προεραιτικά, αλλά για να προχωρήσει η πληρωμή το client_telephone, το client_email και το client_country_id είναι αναγκαστικά.
+Για να επαλήθευσεις ότι η αγορά μπορεί αν προχωρήσει καλείς αυτό το endpoint
+api('/client/payment/check')
 
 */
 
 const stripe=Stripe(STRIPE_KEY);
 var amount=parseFloat(price_el.innerText)*100;
 
-
-const elements=stripe.elements({
+// ELEMENTS
+var elements=stripe.elements({
 	mode:'payment',
 	amount,
 	currency:'eur'
 });
-const express_checkout=elements.create('expressCheckout');
+var express_checkout=elements.create('expressCheckout');
 express_checkout.mount(express_checkout_el);
+
+// EVENTS
 express_checkout.on('click',event=>{
 	const new_amount=parseFloat(price_el.innerText)*100;
 	if(new_amount!==amount){
 		amount=new_amount;
 		elements.update({amount});
 	}
-	//api('/client/update',new FormData(c1730199501i0__form)).then(res=>res?event.resolve():null);
-	//get_country_id('el')
 	event.resolve();
+});
+express_checkout.on('shippingaddresschange',event=>{
+	api('/client/update',{
+		client_country_id:get_country_id(event.address.country.toLowerCase()),
+		client_city:event.address.city??null,
+		client_postal_code:event.address.postal_code??null
+	});
+	event.resolve(payload);
 });
 express_checkout.on('confirm',event=>{
 	stripe.confirmPayment({elements,confirmParams:{return_url:'https://eshop.teticharitou.com/checkout'}}).then(result=>{
